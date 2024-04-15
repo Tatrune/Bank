@@ -250,11 +250,11 @@ class Account : public Customer
         setMoney(0);
     }
 
-    void in()
+    void in(int customerId)
     {
         cout << "In thong tin Account" << endl;
         Customer::in();
-        cout << "CustomerId: " << getId() << endl;
+        cout << "CustomerId: " << customerId << endl;
     }
     
 };
@@ -306,6 +306,12 @@ class Teller : public Customer
 	public:
     Teller()
     {
+    }
+
+    void set(int customerId, int money)
+    {
+        CustomerId = customerId;
+        setMoney(money);
     }
 
     void CollectMoney(int customerid, int tien, int accountid)
@@ -402,7 +408,7 @@ int main()
     int dem_loan = 0;
     int dem_teller = 0;
 
-    Customer Customer1(9000,"nu","hcm",2,8668);
+    Customer Customer1(9000,"nu","hcm",1,8668);
     Account Acc_arr[10];
     Loan Loan_arr[10];
     Teller Teller_arr[10];
@@ -436,12 +442,12 @@ int main()
                     Acc_arr[i].CleanAccount();
                 }
             }
-            Acc_arr[id].in();
+            Acc_arr[id].in(Customer1.getId());
                 break;
             
             case 3: // Loan created by account
             int acc_id;
-            cout << "Nhap ID cua account ma ban muon tao thanh Loan" << endl;
+            cout << "Nhap ID cua account ma ban muon tao thanh Loan" << endl; cin >> acc_id;
                 if(Customer1.ApplyForLoans("nhap vao 1 type", Acc_arr[acc_id].getId())) // Acc_arr[0].getId(): ID cua account can de tao ra 1 doi tuong Loan
                 {
                     // dem_loan la id cua Loan
@@ -454,7 +460,10 @@ int main()
             break;
 
             case 4: // Open Teller
-                Teller_arr[dem_teller].OpenAccount(Customer1.getId(), 1000);
+                if(Teller_arr[dem_teller].OpenAccount(Customer1.getId(), 1000))
+                {
+                    Teller_arr[dem_teller].set(Customer1.getId(), 1000);
+                }
                 Teller_arr[dem_teller].setName(Customer1.getName()); // name of teller
                 Teller_arr[dem_teller].setId(dem_teller); // Id of Teller
                 dem_teller++;
@@ -484,9 +493,9 @@ int main()
             cout << "So tien can kiem tra: " << endl; cin >> moneyTeller_check;
             if(Teller_arr[choice_teller].LoanRequest(Customer1.getId(), moneyTeller_check))
             {
-                cout << "Tai Khoan Du Tien" << endl;
+                cout << "Tai Khoan co ton tai" << endl;
             }
-            cout << "khong co tai khoan hoac tai khoan khong du tien" << endl;
+            cout << "Tai khoan khong ton tai hoac khong du tien" << endl;
             break;
             
             case 8:
@@ -506,7 +515,7 @@ int main()
             case 9:
             for(int i = 0; i < dem_account; i++)
             {
-                Acc_arr[i].in();
+                Acc_arr[i].in(Customer1.getId());
             }
             break;
 
