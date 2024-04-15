@@ -22,41 +22,50 @@ public:
     bank()
     {
     }
+    
     bank(int tien, string name, string location)
     {
         Money = tien;
         Name = name;
         Location = location;   
     }
+
     int getBankId()
     {
         return BankId;
     }
+
     string getName()
     {
         return Name;
     }
+
     string getLocale()
     {
         return Location;
     }
+
     int setMoney(int tien)
     {
         Money = tien;
         return Money;
     }
+
     int getMoney()
     {
         return Money;
     }
+
     void setName(string name)
     {
         Name = name;
     }
+
     void setLocation(string location)
     {
         Location = location;
     }
+
     string getLocation()
     {
         return Location;
@@ -73,6 +82,7 @@ public:
     Customer()
     {
     }
+
     Customer(int tien, string name, string location, int id, int phone) : bank(tien,name,location)
     {
         setMoney(tien);
@@ -82,12 +92,15 @@ public:
         PhoneNo = phone;
         
     }
+
     void Generallnquiry()
     {
     }
+
     void DepositMonet()
     {
     }
+
     int WithdrawMoney(int tien)
     {
         int tienconlai;
@@ -110,6 +123,7 @@ public:
         }
         return false;
     }
+
     bool ApplyForLoans(string type, int accountid)
     {
         if(accountid < 0 )
@@ -128,13 +142,20 @@ public:
     {
         return Id;
     }
+
     int getAccountId()
     {
         return Id;
     }
+
     void setPhone(int phone)
     {
         PhoneNo = phone;
+    }
+
+    int getPhone()
+    {
+        return PhoneNo;
     }
     
     void nhap()
@@ -175,15 +196,18 @@ class Account : public Customer
     Account()
     {
     }
+
     Account(int tien)
     {
         setMoney(tien);
     }
+
     Account(int tien, int customerId)
     {
         setMoney(tien);
         CustomerId = customerId;
     }
+
     Account(int tien, string name, string location, int id, int phone, int customerId)
     {
         setMoney(tien);
@@ -193,10 +217,12 @@ class Account : public Customer
         setPhone(phone);
         setId(customerId);
     }
+
     void setCustomerId(int customerId)
     {
         CustomerId = customerId;
     }
+
     void nhap(int tien)
     {
         string tmp;
@@ -217,6 +243,9 @@ class Account : public Customer
     void CleanAccount()
     {
         setId(0);
+        setName("");
+        setLocation("");
+        setPhone(0);
         CustomerId = 0;
         setMoney(0);
     }
@@ -234,7 +263,7 @@ class Loan : public Customer
 {
     private:
     int Id;
-    string type;
+    string Type;
     int AccountId;
     int CustomerId;
 
@@ -242,8 +271,28 @@ class Loan : public Customer
     Loan() : Customer()
     {
     }
-    Loan(int Id, string type, int AccountId, int CustomerId)
+
+    Loan(int id, string type, int AccountId, int CustomerId, string name, string location, int phone)
     {
+        this -> Id = id;
+        this -> Type = type;
+        this -> AccountId = AccountId;
+        this -> CustomerId = CustomerId;
+        setName(name);
+        setLocation(location);
+        setPhone(phone);
+    }
+
+    void in(int accountId, int customerId)
+    {
+        cout << "Id: " << Id << endl;
+        cout << "Name: " << getName() << endl;
+        cout << "Address: " << getLocation() << endl;
+        cout << "Money: " << getMoney() << endl;
+        cout << "PhoneNo: " << getPhone() << endl;
+        cout << "AccountId: " << accountId << endl;
+        cout << "CustomerId: " << customerId << endl;
+
     }
 };
 
@@ -256,7 +305,10 @@ class Teller : public Customer
     int AccountId;
 
 	public:
-    Teller(){}
+    Teller()
+    {
+    }
+
     void CollectMoney(int customerid, int tien, int accountid)
     {
         this -> CustomerId = customerid;
@@ -310,29 +362,63 @@ class Teller : public Customer
 
 int main()
 {
+    int dem_account = 0;
+    int dem_loan = 0;
+    int dem_teller = 0;
+
     Customer Customer1(9000,"nu","hcm",2,8668);
-    Account *Account1 = new Account();
-    if(Customer1.OpenAccount(1000))
+    Account Acc_arr[10];
+    Loan Loan_arr[10];
+    Teller Teller[10];
+
+    int choice;
+    while(true)
     {
-        Account Account1_tmp(1000, Customer1.getId());
-        cout << "Account1_tmp: " << Account1_tmp.getId() << endl;
-        cout << "Nhap thong tin account: " << endl;
-        Account1 = &Account1_tmp;
-        cout << "Account1: " << Account1 << endl;
-        Account1_tmp.nhap(1000);
+        cout << "nhap lua chon" << endl; cin >> choice;
+        switch (choice)
+        {
+            case 1: // dang ky tai 1 tai khoan account
+                cout << "Dang ky Account:" << endl;
+                if(Customer1.OpenAccount(1000))
+                {
+                    Account Account1_tmp(1000, Customer1.getId()); // bo nho dem
+                    cout << "Nhap thong tin account: " << endl;
+                    Acc_arr[dem_account] = Account1_tmp; 
+                    Acc_arr[dem_account].nhap(1000);
+                }
+                dem_account++; // moi lan dang ky 1 tai khoan bien dem cua account se tu tang len
+            break;
+
+            case 2:
+            cout << "Nhap account id ma ban muon xoa: " << endl;
+            int id; cin >> id;
+            for(int i = 0; i < 10; ++i)
+            {
+                if(Acc_arr[i].getId() == id)
+                {
+                    Acc_arr[i].CleanAccount();
+                }
+            }
+            Acc_arr[id].in();
+                break;
+            
+            case 3: // Loan created by account
+                if(Customer1.ApplyForLoans("nhap vao 1 type", Acc_arr[0].getId())) // Acc_arr[0].getId(): ID cua account can de tao ra 1 doi tuong Loan
+                {
+                    Loan Loan_tmp(1,"nhap vao 1 type",Acc_arr[0].getId(), Customer1.getId(),Acc_arr[0].getName(), Acc_arr[0].getLocation(),Acc_arr[0].getPhone());
+                    Loan_arr[dem_loan] = Loan_tmp;
+                    Loan_arr[dem_loan].in(Acc_arr[0].getId(),Customer1.getId()); //in thong tin cua 1 Loan
+                }
+                dem_loan++;
+            break;
+
+            case 4:
+
+
+            break;
+            default:
+                
+                break;
+        }
     }
-    Account1->in();
-    // Account1 -> in();
-    // if(Customer1.CloseAccount(Account1->getId()))
-    // {
-    //     delete Account1;
-    // }
-
-    // Loan Loan1;
-    // if(Customer1.ApplyForLoans("Customer1",1))
-    // {
-    //     Loan tmp(1, "Customer1", Account1->getId(), Customer1.getId());
-    //     Loan1 = tmp;
-    // }
-
 }
