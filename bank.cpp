@@ -22,7 +22,7 @@ public:
     bank()
     {
     }
-    
+
     bank(int tien, string name, string location)
     {
         Money = tien;
@@ -228,7 +228,7 @@ class Account : public Customer
         string tmp;
         int tmp_int;
         cout << "NHAP THONG TIN" << endl;
-        cout << "Id: "; cin >> tmp_int;
+        // cout << "Id: "; cin >> tmp_int;
         setId(tmp_int);
         cin.ignore();
         cout << "Name : "; getline(cin,tmp);
@@ -299,7 +299,6 @@ class Loan : public Customer
 class Teller : public Customer
 {
 	private: 
-    int Id; 
     //name
     int CustomerId;
     int AccountId;
@@ -313,7 +312,8 @@ class Teller : public Customer
     {
         this -> CustomerId = customerid;
         this -> AccountId = accountid;
-        setMoney(tien);
+        setMoney(tien+getMoney());
+
     }
 
     bool OpenAccount(int customerid, int money)
@@ -346,6 +346,25 @@ class Teller : public Customer
     void ProvideInfo(int customerid)
     {
         cout << "CustomerId: " << customerid << endl;
+        cout << "accountId: " << getAccountId() << endl;
+        cout << "Money: " << getMoney() << endl;
+        cout << "name: " << getName() << endl;
+        cout << "address: " << getLocation() << endl;
+    }
+
+    void CleanAccount()
+    {
+        setId(0);
+        setName("");
+        setLocation("");
+        setPhone(0);
+        CustomerId = 0;
+        setMoney(0);
+    }
+
+    int getCustomerId()
+    {
+        return CustomerId;
     }
     
     void in()
@@ -360,6 +379,23 @@ class Teller : public Customer
 
 };
 
+void inMenu()
+{
+    cout << "==============================MENU==============================" << endl;
+    cout << "1: Dang ky 1 tai khoan account" << endl;
+    cout << "2: xoa account" << endl;
+    cout << "3: Tao 1 Loan" << endl;
+    cout << "4: Tao 1 teller" << endl;
+    cout << "5: Them tien vao teller" << endl;
+    cout << "6: Dong 1 tai khoan Teller"  << endl;
+    cout << "7: Kiem tra Teller" << endl;
+    cout << "8: In ra thong tin 1 teller" << endl;
+    cout << "9: in ra thong tin cac account" << endl;
+    cout << "10: Thoat chuong trinh" << endl;
+    cout << "NHAP LUA CHON CUA BAN: " << endl;
+
+}
+
 int main()
 {
     int dem_account = 0;
@@ -369,28 +405,29 @@ int main()
     Customer Customer1(9000,"nu","hcm",2,8668);
     Account Acc_arr[10];
     Loan Loan_arr[10];
-    Teller Teller[10];
+    Teller Teller_arr[10];
 
     int choice;
     while(true)
     {
-        cout << "nhap lua chon" << endl; cin >> choice;
+        inMenu();
+        cin >> choice;
         switch (choice)
         {
             case 1: // dang ky tai 1 tai khoan account
-                cout << "Dang ky Account:" << endl;
                 if(Customer1.OpenAccount(1000))
                 {
                     Account Account1_tmp(1000, Customer1.getId()); // bo nho dem
                     cout << "Nhap thong tin account: " << endl;
                     Acc_arr[dem_account] = Account1_tmp; 
                     Acc_arr[dem_account].nhap(1000);
+                    Acc_arr[dem_account].setId(dem_account);
                 }
                 dem_account++; // moi lan dang ky 1 tai khoan bien dem cua account se tu tang len
             break;
 
             case 2:
-            cout << "Nhap account id ma ban muon xoa: " << endl;
+            cout << "Nhap accountid ma ban muon xoa: " << endl;
             int id; cin >> id;
             for(int i = 0; i < 10; ++i)
             {
@@ -403,22 +440,84 @@ int main()
                 break;
             
             case 3: // Loan created by account
-                if(Customer1.ApplyForLoans("nhap vao 1 type", Acc_arr[0].getId())) // Acc_arr[0].getId(): ID cua account can de tao ra 1 doi tuong Loan
+            int acc_id;
+            cout << "Nhap ID cua account ma ban muon tao thanh Loan" << endl;
+                if(Customer1.ApplyForLoans("nhap vao 1 type", Acc_arr[acc_id].getId())) // Acc_arr[0].getId(): ID cua account can de tao ra 1 doi tuong Loan
                 {
-                    Loan Loan_tmp(1,"nhap vao 1 type",Acc_arr[0].getId(), Customer1.getId(),Acc_arr[0].getName(), Acc_arr[0].getLocation(),Acc_arr[0].getPhone());
+                    // dem_loan la id cua Loan
+                    // acc_id la id cua account 
+                    Loan Loan_tmp(dem_loan,"nhap vao 1 type",Acc_arr[acc_id].getId(), Customer1.getId(),Acc_arr[acc_id].getName(), Acc_arr[acc_id].getLocation(),Acc_arr[acc_id].getPhone());
                     Loan_arr[dem_loan] = Loan_tmp;
-                    Loan_arr[dem_loan].in(Acc_arr[0].getId(),Customer1.getId()); //in thong tin cua 1 Loan
+                    Loan_arr[dem_loan].in(Acc_arr[acc_id].getId(),Customer1.getId()); //in thong tin cua 1 Loan
                 }
                 dem_loan++;
             break;
 
-            case 4:
-
-
+            case 4: // Open Teller
+                Teller_arr[dem_teller].OpenAccount(Customer1.getId(), 1000);
+                Teller_arr[dem_teller].setName(Customer1.getName()); // name of teller
+                Teller_arr[dem_teller].setId(dem_teller); // Id of Teller
+                dem_teller++;
             break;
+
+            case 5: // + money for teller 
+                int Teller_num;;
+                int money;
+                cout << "Nhap ID cua teller can them tien: " << endl; cin >> Teller_num;
+                cout << "Nhap so tien can cam them vao: " << endl; cin >> money;
+                Teller_arr[Teller_num].CollectMoney(Customer1.getId(), money, Acc_arr[0].getId());
+            break;
+
+            case 6: // Close account of teller
+            int choice_teller;
+            cout << "nhap ID tai khoan Teller can dong: " << endl; cin >> choice_teller;
+            if(Teller_arr[choice_teller].CloseAccount(Customer1.getId()))
+            {
+                Teller_arr[choice_teller].CleanAccount();
+            }     
+            break;
+            
+            case 7: //
+            cout << "Kiem tra 1 Teller: "<< endl; 
+            int moneyTeller_check;
+            cin >> choice_teller;
+            cout << "So tien can kiem tra: " << endl; cin >> moneyTeller_check;
+            if(Teller_arr[choice_teller].LoanRequest(Customer1.getId(), moneyTeller_check))
+            {
+                cout << "Tai Khoan Du Tien" << endl;
+            }
+            cout << "khong co tai khoan hoac tai khoan khong du tien" << endl;
+            break;
+            
+            case 8:
+            int check_teller;
+            cout << "Nhap ID cua customer can kiem tra: "<< endl; cin >> check_teller;
+
+            for (auto x : Teller_arr)
+            {
+                if(x.getCustomerId() == check_teller)
+                {
+                    x.ProvideInfo(x.getCustomerId());
+                }
+                else cout << "khong tim thay teller " << endl;
+            }
+            break;
+            
+            case 9:
+            for(int i = 0; i < dem_account; i++)
+            {
+                Acc_arr[i].in();
+            }
+            break;
+
+            case 10: 
+            cout << "thoat";
+            return 0;
+
             default:
-                
-                break;
+            cout << "Nhap sai, Nhap lai" << endl;
+            break;
         }
     }
+    return 0;
 }
